@@ -1,7 +1,5 @@
 "use client"
 
-// Portions adapted from Fumadocs AI search (MIT License, Copyright (c) 2023 Fuma).
-
 import {
   memo,
   useEffect,
@@ -24,7 +22,7 @@ import StopIcon from "@hugeicons/core-free-icons/StopIcon"
 import Tick02Icon from "@hugeicons/core-free-icons/Tick02Icon"
 import { HugeiconsIcon } from "@hugeicons/react"
 import Link from "fumadocs-core/link"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/cn"
 import { Markdown } from "./markdown"
 import {
   getMessagePage,

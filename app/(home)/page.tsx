@@ -9,7 +9,7 @@ import { gitConfig } from "@/lib/shared"
 import { cn } from "@/lib/utils"
 
 const installCommand =
-  "npx shadcn@latest add https://glossen.vercel.app/r/glossen.json"
+  "pnpm dlx shadcn@latest add https://glossen.vercel.app/r/glossen.json"
 
 const features = [
   "Answers from your whole documentation",

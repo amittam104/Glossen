@@ -1,45 +1,51 @@
-# glossen-scaffold
+# Glossen
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+An editable Ask AI experience for [Fumadocs](https://fumadocs.dev), installed as source through a shadcn registry.
 
-Run development server:
+- Answers from your entire documentation, with verified source links
+- Current-page context and selected-passage attachments
+- Saved conversations with per-conversation drafts, background answers and multi-tab sync
+- Edit earlier questions and regenerate
+- Next.js and TanStack Start backend starters built on the AI SDK and OpenRouter
+
+Read the documentation at [glossen.vercel.app/docs](https://glossen.vercel.app/docs).
+
+## Install
 
 ```bash
-npm run dev
-# or
-pnpm dev
-# or
-yarn dev
+pnpm dlx shadcn@latest add https://glossen.vercel.app/r/glossen.json https://glossen.vercel.app/r/glossen-next.json
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+See [Install on Next.js](content/docs/installation.mdx) and [Install on TanStack Start](content/docs/tanstack-start.mdx) for the full setup.
 
-## Explore
+## Development
 
-In the project, you can see:
+```bash
+pnpm install
+cp .env.example .env   # add OPENROUTER_API_KEY
+pnpm dev               # http://localhost:3002
+```
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
+| Command               | Purpose                                            |
+| --------------------- | -------------------------------------------------- |
+| `pnpm dev`            | Build the registry and start the site on port 3002 |
+| `pnpm build`          | Build the registry and the production site         |
+| `pnpm lint`           | ESLint                                             |
+| `pnpm types:check`    | Generate route types and run TypeScript            |
+| `pnpm registry:build` | Write registry items to `public/r`                 |
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+## Layout
 
-### Fumadocs MDX
+| Path                       | Contents                                                              |
+| -------------------------- | --------------------------------------------------------------------- |
+| `components/glossen/`      | Distributed UI (installed to `components/glossen/*`)                  |
+| `lib/glossen/chat.ts`      | Distributed answer generation shared by both backend starters         |
+| `registry/starters/`       | Thin Next.js and TanStack Start routes installed by the backend items |
+| `app/api/chat/route.ts`    | This site's demo route: the same handler plus demo-only limits        |
+| `registry.json`            | Registry item definitions; output goes to `public/r`                  |
+| `examples/tanstack-start/` | TanStack Start app installed from the local registry                  |
+| `content/docs/`            | Documentation, also the demo assistant's context                      |
 
-Collections are defined with the [Macro API](https://fumadocs.dev/docs/mdx/macro) in `lib/source.ts`.
+## License
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
-
-## Learn More
-
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs
+[MIT](LICENSE). Parts of the chat UI are adapted from Fumadocs' AI search (MIT, Copyright (c) 2023 Fuma).

@@ -1,6 +1,6 @@
 # Glossen design decisions
 
-Consolidated first-release scope from the design interview, approved by the user. Execution is described in [IMPLEMENTATION_PLAN.md](../IMPLEMENTATION_PLAN.md). Implementation has not started.
+Consolidated first-release scope from the design interview, approved by the user. Execution is described in [IMPLEMENTATION_PLAN.md](../IMPLEMENTATION_PLAN.md). Implementation status is tracked in the plan.
 
 ## Agreed scope
 

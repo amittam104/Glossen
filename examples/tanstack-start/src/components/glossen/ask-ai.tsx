@@ -1,7 +1,3 @@
-"use client"
-
-// Portions adapted from Fumadocs AI search (MIT License, Copyright (c) 2023 Fuma).
-
 import {
   useEffect,
   useEffectEvent,
@@ -17,7 +13,7 @@ import Clock01Icon from "@hugeicons/core-free-icons/Clock01Icon"
 import Delete02Icon from "@hugeicons/core-free-icons/Delete02Icon"
 import PencilEdit02Icon from "@hugeicons/core-free-icons/PencilEdit02Icon"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/cn"
 import { Composer, ConversationView } from "./conversation"
 import { useGlossen, useGlossenState } from "./provider"
 import { SelectionAskAI } from "./selection"

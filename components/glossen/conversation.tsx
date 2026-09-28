@@ -33,6 +33,7 @@ import {
   type Source,
 } from "./message"
 import { useGlossen, useGlossenState } from "./provider"
+import { readableError } from "./store"
 import {
   Chevron,
   Collapsible,
@@ -193,10 +194,10 @@ function SourceList({ sources }: { sources: Source[] }) {
                     aria-hidden
                     className="size-3.5 shrink-0"
                   />
-                  <span className="truncate font-medium text-fd-foreground">
+                  <span className="min-w-0 flex-1 truncate font-medium text-fd-foreground">
                     {source.title}
                   </span>
-                  <span className="ms-auto truncate ps-2 font-mono text-[10.5px]">
+                  <span className="max-w-[45%] shrink-0 truncate ps-2 font-mono text-[10.5px]">
                     {source.url}
                   </span>
                 </Link>
@@ -547,7 +548,7 @@ export function ConversationView({ id }: { id: string }) {
   const last = visible.at(-1)
   const userCount = visible.filter((message) => message.role === "user").length
   const failure =
-    error?.message ??
+    readableError(error) ??
     (record?.status === "failed" && !busy ? record.error : undefined)
   const regenerate = () => void store.regenerate(id)
 

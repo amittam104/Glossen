@@ -88,6 +88,18 @@ function getTitle(messages: GlossenUIMessage[]) {
   return title.length > 100 ? `${title.slice(0, 99)}…` : title || "New chat"
 }
 
+export function readableError(error: Error | undefined) {
+  if (!error) return undefined
+  if (
+    error.name === "TypeError" ||
+    /network error|failed to fetch|load failed|networkerror/i.test(
+      error.message
+    )
+  )
+    return "Couldn’t reach the chat service. Check your connection, then try again."
+  return error.message || "The request failed. Try again in a moment."
+}
+
 function isBusy(chat: Chat<GlossenUIMessage> | undefined) {
   return chat?.status === "submitted" || chat?.status === "streaming"
 }
@@ -107,6 +119,7 @@ export class GlossenStore {
   private draftTimers = new Map<string, ReturnType<typeof setTimeout>>()
   private heartbeat: ReturnType<typeof setInterval> | undefined
   private started = false
+  private unloading = false
 
   constructor(options: StoreOptions) {
     this.options = options
@@ -178,14 +191,30 @@ export class GlossenStore {
     if (this.persistent) this.load()
 
     const onStorage = (event: StorageEvent) => this.onStorage(event)
-    const onPageHide = () => this.flushAll()
+    const onPageHide = () => {
+      this.unloading = true
+      this.flushAll()
+    }
+    const onPageShow = () => {
+      this.unloading = false
+    }
+    const onBeforeUnload = () => {
+      this.unloading = true
+      setTimeout(() => {
+        if (document.visibilityState === "visible") this.unloading = false
+      }, 1000)
+    }
     window.addEventListener("storage", onStorage)
     window.addEventListener("pagehide", onPageHide)
+    window.addEventListener("pageshow", onPageShow)
+    window.addEventListener("beforeunload", onBeforeUnload)
     this.heartbeat = setInterval(() => this.beat(), heartbeatInterval)
 
     return () => {
       window.removeEventListener("storage", onStorage)
       window.removeEventListener("pagehide", onPageHide)
+      window.removeEventListener("pageshow", onPageShow)
+      window.removeEventListener("beforeunload", onBeforeUnload)
       clearInterval(this.heartbeat)
       this.flushAll()
       this.started = false
@@ -479,6 +508,7 @@ export class GlossenStore {
       if (!draft.text && draft.passages.length === 0 && draft.includePage)
         this.storage.removeDraft(id)
       else this.storage.writeDraft(draft)
+      if (id === this.snapshot.activeId) this.storage.writeActive(id)
     } catch {
       this.failStorage()
     }
@@ -582,6 +612,7 @@ export class GlossenStore {
     this.set({ generating: { ...this.snapshot.generating, [id]: true } })
 
     const existed = Boolean(this.snapshot.records[id])
+    if (id === this.snapshot.activeId) this.writeActive(id)
     const started = action(chat)
     this.save(id, {
       status: "generating",
@@ -596,12 +627,12 @@ export class GlossenStore {
       const generating = { ...this.snapshot.generating }
       delete generating[id]
       this.set({ generating })
-      if (!this.deleted.has(id)) {
+      if (!this.deleted.has(id) && !this.unloading) {
         const failed = chat.status === "error"
         this.save(id, {
           status: failed ? "failed" : "idle",
           owner: undefined,
-          error: failed ? chat.error?.message : undefined,
+          error: failed ? readableError(chat.error) : undefined,
           activeAt: Date.now(),
         })
       }

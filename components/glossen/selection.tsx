@@ -19,6 +19,13 @@ function elementOf(node: Node | null) {
   return node instanceof Element ? node : (node?.parentElement ?? null)
 }
 
+function headingText(heading: HTMLElement) {
+  const clone = heading.cloneNode(true) as HTMLElement
+  for (const node of clone.querySelectorAll("button, [aria-hidden='true']"))
+    node.remove()
+  return clone.textContent?.trim()
+}
+
 function readSelection(contentSelector: string): Target | null {
   const selection = window.getSelection()
   if (!selection || selection.isCollapsed || selection.rangeCount === 0)
@@ -51,9 +58,9 @@ function readSelection(contentSelector: string): Target | null {
     scope.querySelector("h1")?.textContent?.trim() ||
     document.title.trim() ||
     location.pathname
-  const headingText = heading?.textContent?.trim()
+  const label = heading ? headingText(heading) : undefined
   const url =
-    heading?.id && headingText
+    heading?.id && label
       ? `${location.pathname}#${encodeURIComponent(heading.id)}`
       : location.pathname
 
@@ -63,7 +70,7 @@ function readSelection(contentSelector: string): Target | null {
       title,
       url,
       text,
-      ...(headingText ? { heading: headingText } : {}),
+      ...(label ? { heading: label } : {}),
     },
     rect: {
       top: bounds.top,

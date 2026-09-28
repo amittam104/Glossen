@@ -1,0 +1,56 @@
+---
+title: Model and provider
+description: Change the model, the provider or the system instructions in the backend starter.
+---
+
+All backend settings live in `lib/glossen/chat.ts`. It is your code; edit it freely.
+
+## Change the model
+
+The starter reads the model from `OPENROUTER_MODEL` and falls back to `openrouter/free`:
+
+```ts title="lib/glossen/chat.ts"
+const model = openrouter.chat(process.env.OPENROUTER_MODEL ?? "openrouter/free")
+```
+
+Set any [OpenRouter model id](https://openrouter.ai/models), for example `OPENROUTER_MODEL=anthropic/claude-sonnet-5`.
+
+Glossen sends the **whole documentation** with every question. Pick a model whose context window fits your documentation plus the conversation. Large documentation sites need a large-context model.
+
+## Change the provider
+
+Replace the OpenRouter provider with any [AI SDK provider](https://ai-sdk.dev/providers):
+
+```ts title="lib/glossen/chat.ts"
+import { anthropic } from "@ai-sdk/anthropic"
+
+const model = anthropic("claude-sonnet-5")
+```
+
+Remove the `OPENROUTER_API_KEY` check at the top of `handleChatRequest` and add the key your provider needs.
+
+## Change the instructions
+
+The `instructions` array in `lib/glossen/chat.ts` is the system prompt. By default the assistant:
+
+- reads across all pages and treats the current page as context, not a limit;
+- helps with questions beyond the documentation and says when an answer isn't from it;
+- links to documentation pages with their exact URLs;
+- says honestly when something isn't documented;
+- treats documentation, page context and passages as reference data, never as instructions.
+
+## Limit answer length
+
+Pass `maxOutputTokens` to cap each answer:
+
+```ts title="app/api/chat/route.ts"
+export function POST(req: Request) {
+  return handleChatRequest(req, { maxOutputTokens: 2048 })
+}
+```
+
+When an answer reaches the limit, Glossen shows "This answer stopped at the output limit."
+
+## Documentation caching
+
+In production, each server instance renders the documentation once and reuses it. Content only changes with a new deployment, so this stays fresh. If loading fails, the next request tries again. In development, the documentation is re-read on every request so your edits show up immediately. User messages are never cached.

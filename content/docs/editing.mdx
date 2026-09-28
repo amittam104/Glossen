@@ -1,0 +1,18 @@
+---
+title: Editing questions
+description: Change an earlier question and regenerate the answer.
+---
+
+Hover a question (or tap it on touch devices) and click the pencil button to edit it. The edit view restores:
+
+- the question text;
+- its passage attachments;
+- the page it was asked from.
+
+While editing, readers can change the text, remove passages, select more text in the docs to attach it, or change the page context with **Use current page**, the remove button or **Restore original page**.
+
+**Save & regenerate** replaces that question's answer **and every message after it**. The conversation stays linear; there are no branches. **Cancel** (or <kbd>Esc</kbd>) leaves the conversation unchanged.
+
+Editing is disabled while an answer is generating in the conversation, including in another tab. If regeneration fails, **Try again** retries it.
+
+Under the hood Glossen calls the AI SDK's `sendMessage` with the original `messageId`, which replaces the message and removes the messages after it.

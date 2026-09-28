@@ -2,5 +2,5 @@ allowBuilds:
   esbuild: true
   unrs-resolver: true
 minimumReleaseAgeExclude:
-  - '@fumadocs/base-ui@16.15.15'
+  - "@fumadocs/base-ui@16.15.15"
   - fumadocs-core@16.15.15

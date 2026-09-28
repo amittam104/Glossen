@@ -1,0 +1,22 @@
+{
+  "title": "Glossen",
+  "pages": [
+    "---Get started---",
+    "index",
+    "installation",
+    "tanstack-start",
+    "existing-backend",
+    "---Guides---",
+    "configuration",
+    "model-and-provider",
+    "conversations",
+    "selection",
+    "editing",
+    "errors",
+    "---Reference---",
+    "message-contract",
+    "compatibility",
+    "demo",
+    "roadmap"
+  ]
+}

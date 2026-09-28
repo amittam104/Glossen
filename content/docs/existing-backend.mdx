@@ -1,0 +1,39 @@
+---
+title: Keep your own backend
+description: Install only the UI and connect it to an existing AI SDK chat endpoint.
+---
+
+Install only the UI item:
+
+```bash
+npx shadcn@latest add https://glossen.vercel.app/r/glossen.json
+```
+
+Then point the provider at your endpoint:
+
+```tsx
+<GlossenProvider endpoint="/api/assistant">{children}</GlossenProvider>
+```
+
+## What your endpoint must do
+
+Glossen uses the AI SDK's `DefaultChatTransport`. Your endpoint receives a `POST` with `{ id, messages, trigger, messageId }` and must answer with an AI SDK **UI message stream** (for example `createUIMessageStreamResponse`).
+
+Plain text chat is not enough. Every user message can contain two custom data parts:
+
+- `data-page` — the page the reader asked from: `{ title, url }`
+- `data-passage` — a selected passage: `{ title, url, text, heading? }`
+
+The AI SDK **drops data parts** when it converts UI messages for the model, unless you convert them yourself. Without this, the model never sees the reader's page or selected passages. See the [message contract](/docs/message-contract) for the full schema and an example `convertDataPart`.
+
+## Optional: verified sources
+
+The sources list under each answer comes from a `data-sources` part: `[{ title, url }]`. Glossen's backend builds it by checking every documentation link in the answer against the real page list. If your endpoint doesn't send it, answers still work; they just have no sources list.
+
+## Optional: output-limit label
+
+If your endpoint sets message metadata `{ finishReason: "length" }` on the `finish` chunk, Glossen tells readers the answer stopped at the output limit.
+
+## Errors
+
+When your endpoint returns a non-2xx response before streaming, Glossen shows the response **text** as the error message. Return short, safe messages rather than raw provider errors.

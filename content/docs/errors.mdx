@@ -1,0 +1,46 @@
+---
+title: Errors and troubleshooting
+description: What readers see when a request fails, and how to fix common problems.
+---
+
+## Error messages
+
+The backend never forwards raw provider errors. It logs them on the server and maps known failures to short messages:
+
+| Failure                 | Message                                                                                                                  |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Context window exceeded | This conversation is too large for the model's context window. Remove some passages or start a new chat, then try again. |
+| Rate limit              | The AI provider is rate-limiting requests right now. Wait a moment, then try again.                                      |
+| Model unavailable       | The AI model is unavailable right now. Try again in a moment.                                                            |
+| Timeout                 | The answer took too long and timed out. Try again in a moment.                                                           |
+| Anything else           | Something went wrong while generating the answer. Try again in a moment.                                                 |
+
+Errors before streaming (an invalid request, documentation that can't load, a missing key) return a plain-text response. Errors during streaming go through the stream's error handler. Both show in the chat with a **Try again** button.
+
+A failed question stays in the conversation with its passages, so nothing needs to be retyped. Glossen never truncates passages, drops documentation or switches to search to make a request fit.
+
+## Troubleshooting
+
+### "The chat service isn't configured yet."
+
+`OPENROUTER_API_KEY` is missing on the server. Add it to `.env.local` and restart the dev server.
+
+### The answer ignores my selected passages
+
+If you use your own backend, it must convert `data-passage` and `data-page` parts. See [Keep your own backend](/docs/existing-backend).
+
+### The context window error appears on every question
+
+Your documentation plus the conversation doesn't fit the model. Choose a model with a larger context window in `OPENROUTER_MODEL`. Check the size of your documentation at `/llms-full.txt`.
+
+### Free models are slow or rate-limited
+
+OpenRouter's free models share capacity. `openrouter/free` picks an available free model for each request, so speed and answer quality vary. Free models also have daily request limits per account. Use a paid model for production.
+
+### The Ask AI button doesn't appear when I select text
+
+Selection only works inside `contentSelector` (`#nd-page` by default). If your docs page uses another container, set `contentSelector`. Also check that `selection` isn't `false`.
+
+### History isn't saved
+
+The browser may block `localStorage` (private windows in some browsers, or storage settings). Glossen then keeps chats in memory and shows a notice.

@@ -1,0 +1,58 @@
+---
+title: Message contract
+description: The message format between the Glossen UI and the backend.
+---
+
+Glossen uses AI SDK UI messages with typed data parts. The types and Zod schemas are in `components/glossen/message.ts`, shared by the UI and the backend.
+
+```ts title="components/glossen/message.ts"
+type Passage = { title: string; url: string; text: string; heading?: string }
+type PageContext = { title: string; url: string }
+type Source = { title: string; url: string }
+
+type GlossenUIMessage = UIMessage<
+  { finishReason?: string },
+  { passage: Passage; page: PageContext; sources: Source[] }
+>
+```
+
+## User messages
+
+A user message has, in order:
+
+1. an optional `data-page` part — the page the reader asked from;
+2. zero or more `data-passage` parts — selected passages;
+3. one `text` part — the question.
+
+`url` in a passage includes `#anchor` only when the nearest heading has a real id on the page.
+
+## Assistant messages
+
+- `text` parts with the answer in Markdown;
+- an optional `data-sources` part, sent after the answer, with documentation pages the answer linked to. Every entry is checked against the real page list; anchors are kept only if they exist on that page;
+- message metadata `{ finishReason }`.
+
+## Converting data parts for the model
+
+`convertToModelMessages` ignores data parts unless you convert them. The Glossen backend does this:
+
+```ts
+const modelMessages = await convertToModelMessages<GlossenUIMessage>(messages, {
+  convertDataPart(part) {
+    if (part.type === "data-page")
+      return { type: "text", text: `[Reader's current page (reference data): ...]` }
+    if (part.type === "data-passage")
+      return { type: "text", text: `[Passage the reader selected ...]\n<passage>\n${part.data.text}\n</passage>` }
+  },
+})
+```
+
+The instructions tell the model to treat these as reference data, never as instructions.
+
+## Validation
+
+The backend validates incoming messages with `safeValidateUIMessages` and the schemas from `message.ts`, and rejects invalid requests with `400`.
+
+## Stable IDs
+
+Message IDs are kept across storage, streaming and editing. Editing sends the edited message with its original `messageId`, which replaces it and the messages after it.

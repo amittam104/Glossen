@@ -1,0 +1,75 @@
+---
+title: Configuration
+description: Options for GlossenProvider, the panel and the trigger.
+---
+
+All options go on `GlossenProvider`. Everything else, such as layout and wording, is in the installed source under `components/glossen/*`, which you can edit directly.
+
+<TypeTable
+  type={{
+    endpoint: {
+      type: "string",
+      default: '"/api/chat"',
+      description: "The chat API route.",
+    },
+    historyLimit: {
+      type: "number",
+      default: "20",
+      description:
+        "How many conversations to keep in the browser. `0` keeps chats and drafts in memory only.",
+    },
+    storageKey: {
+      type: "string",
+      default: '"glossen"',
+      description:
+        "Prefix for localStorage keys. Change it to keep two sites on one domain apart.",
+    },
+    welcome: {
+      type: "{ title?: string; description?: string }",
+      description: "Text on the empty chat screen.",
+    },
+    placeholder: {
+      type: "string",
+      default: '"Ask a question…"',
+      description: "Placeholder of the question input.",
+    },
+    suggestions: {
+      type: "string[]",
+      default: "[]",
+      description:
+        "Suggested questions on the empty chat screen. Clicking one sends it.",
+    },
+    selection: {
+      type: "boolean",
+      default: "true",
+      description: "Show the Ask AI button for selected documentation text.",
+    },
+    contentSelector: {
+      type: "string",
+      default: '"#nd-page"',
+      description:
+        "CSS selector for the documentation content. Selection only works inside it, and the page title comes from its first `h1`.",
+    },
+  }}
+/>
+
+## Styling
+
+The components use Fumadocs theme tokens such as `bg-fd-background` and `text-fd-muted-foreground`, so they follow your Fumadocs theme and dark mode without extra CSS. Glossen does not add a global theme.
+
+`AskAIPanel` and `AskAITrigger` accept `className`. `AskAITrigger` also accepts children to replace its label:
+
+```tsx
+<AskAITrigger className="bottom-6">Ask the docs</AskAITrigger>
+```
+
+The panel is a right-side overlay from the `lg` breakpoint and an inset dialog on smaller screens. It is 400px wide (440px from `2xl`). Change `--glossen-width` in `components/glossen/ask-ai.tsx` to adjust.
+
+## Keyboard shortcuts
+
+| Keys                                                      | Action                                                   |
+| --------------------------------------------------------- | -------------------------------------------------------- |
+| <kbd>⌘</kbd> <kbd>/</kbd> or <kbd>Ctrl</kbd> <kbd>/</kbd> | Open or close Ask AI                                     |
+| <kbd>Esc</kbd>                                            | Close Ask AI, or cancel editing                          |
+| <kbd>Enter</kbd>                                          | Send (<kbd>Shift</kbd> <kbd>Enter</kbd> adds a new line) |
+| <kbd>Alt</kbd> <kbd>A</kbd>                               | Attach the selected documentation text                   |

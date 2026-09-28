@@ -1,13 +1,46 @@
 ---
-title: Hello World
-description: Your first document
+title: Introduction
+description: An editable Ask AI experience for Fumadocs documentation sites.
 ---
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+Glossen adds an **Ask AI** panel to a [Fumadocs](https://fumadocs.dev) site. Readers ask questions in plain language and get answers built from your **entire documentation**, with links to the pages the answer came from.
 
-## What is Next?
+You install Glossen as **source code** through a shadcn registry. There is no npm package, no hosted Glossen service and no Fumadocs fork. The UI and the optional API route live in your project, and you can edit both.
+
+## What readers get
+
+- **Answers from the whole documentation.** The backend sends every page to the model, so answers can combine information from several pages.
+- **Current-page context.** Each question includes the page the reader is on, shown as a small label above the input.
+- **Selection context.** Readers select text in the docs, click **Ask AI**, and the passage is attached to their next question with its page title, URL and nearest heading.
+- **Saved conversations.** Up to 20 conversations are kept in the reader's browser. Each conversation keeps its own unsent draft.
+- **Background answers.** An answer keeps generating while the reader switches conversations, starts a new one or closes the panel.
+- **Editing.** Readers can edit an earlier question. **Save & regenerate** replaces that answer and everything after it.
+- **Message actions.** Copy, regenerate the latest answer, stop, retry and an expandable list of documentation sources.
+
+## What you get as a developer
+
+- Editable UI installed under `components/glossen/*`.
+- An editable backend starter for **Next.js** or **TanStack Start**, built on the [AI SDK](https://ai-sdk.dev) with [OpenRouter](https://openrouter.ai) as the default provider.
+- Simple options for the endpoint, history limit, welcome text, placeholder, suggested questions and selection.
+- Fumadocs theme tokens (`fd-*`), so the panel matches your site in light and dark mode.
+
+## How it works
+
+1. `GlossenProvider` in your root layout owns every conversation, so answers continue while readers navigate.
+2. `AskAIPanel` and `AskAITrigger` in your docs layout render the chat and the floating button.
+3. The chat sends messages to your API route (`/api/chat` by default).
+4. The route loads your processed documentation through `@/lib/source`, adds it to the model instructions and streams the answer back.
+5. After the answer finishes, the route checks every documentation link in it against your real page list and sends back the verified sources.
 
 <Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.dev" />
+  <Card title="Install on Next.js" href="/docs/installation" />
+  <Card title="Install on TanStack Start" href="/docs/tanstack-start" />
+  <Card title="Keep your own backend" href="/docs/existing-backend" />
+  <Card title="Configuration" href="/docs/configuration" />
 </Cards>
+
+<Callout title="About this demo">
+  The Ask AI panel on this site uses OpenRouter's free models through Glossen's
+  own key. When you install Glossen, you use your own provider key and choose
+  your own model. See [Public demo and privacy](/docs/demo).
+</Callout>

@@ -1,0 +1,138 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "glossen",
+  "homepage": "https://github.com/amittam104/glossen",
+  "items": [
+    {
+      "name": "glossen",
+      "type": "registry:component",
+      "title": "Glossen Ask AI",
+      "description": "Ask AI panel for Fumadocs with saved conversations, selection context and editing. Mount GlossenProvider in the root layout and AskAIPanel with AskAITrigger in the docs layout.",
+      "dependencies": [
+        "ai@^7.0.118",
+        "@ai-sdk/react@^4.0.121",
+        "zod@^4.6.5",
+        "react-markdown@^10.1.0",
+        "remark-gfm@^4.0.1",
+        "@hugeicons/react@^1.1.10",
+        "@hugeicons/core-free-icons@^4.3.5"
+      ],
+      "files": [
+        {
+          "path": "components/glossen/ask-ai.tsx",
+          "type": "registry:component",
+          "target": "components/glossen/ask-ai.tsx"
+        },
+        {
+          "path": "components/glossen/conversation.tsx",
+          "type": "registry:component",
+          "target": "components/glossen/conversation.tsx"
+        },
+        {
+          "path": "components/glossen/index.ts",
+          "type": "registry:component",
+          "target": "components/glossen/index.ts"
+        },
+        {
+          "path": "components/glossen/markdown.tsx",
+          "type": "registry:component",
+          "target": "components/glossen/markdown.tsx"
+        },
+        {
+          "path": "components/glossen/message.ts",
+          "type": "registry:component",
+          "target": "components/glossen/message.ts"
+        },
+        {
+          "path": "components/glossen/provider.tsx",
+          "type": "registry:component",
+          "target": "components/glossen/provider.tsx"
+        },
+        {
+          "path": "components/glossen/selection.tsx",
+          "type": "registry:component",
+          "target": "components/glossen/selection.tsx"
+        },
+        {
+          "path": "components/glossen/storage.ts",
+          "type": "registry:component",
+          "target": "components/glossen/storage.ts"
+        },
+        {
+          "path": "components/glossen/store.ts",
+          "type": "registry:component",
+          "target": "components/glossen/store.ts"
+        },
+        {
+          "path": "components/glossen/ui.tsx",
+          "type": "registry:component",
+          "target": "components/glossen/ui.tsx"
+        }
+      ]
+    },
+    {
+      "name": "glossen-next",
+      "type": "registry:block",
+      "title": "Glossen backend for Next.js",
+      "description": "Editable App Router chat route that answers with your full Fumadocs documentation through the AI SDK and OpenRouter.",
+      "dependencies": [
+        "ai@^7.0.118",
+        "@openrouter/ai-sdk-provider@^3.1.0",
+        "zod@^4.6.5"
+      ],
+      "envVars": {
+        "OPENROUTER_API_KEY": "",
+        "OPENROUTER_MODEL": "openrouter/free"
+      },
+      "files": [
+        {
+          "path": "components/glossen/message.ts",
+          "type": "registry:component",
+          "target": "components/glossen/message.ts"
+        },
+        {
+          "path": "lib/glossen/chat.ts",
+          "type": "registry:lib",
+          "target": "lib/glossen/chat.ts"
+        },
+        {
+          "path": "registry/starters/next/route.ts",
+          "type": "registry:file",
+          "target": "app/api/chat/route.ts"
+        }
+      ]
+    },
+    {
+      "name": "glossen-tanstack-start",
+      "type": "registry:block",
+      "title": "Glossen backend for TanStack Start",
+      "description": "Editable TanStack Start server route that answers with your full Fumadocs documentation through the AI SDK and OpenRouter.",
+      "dependencies": [
+        "ai@^7.0.118",
+        "@openrouter/ai-sdk-provider@^3.1.0",
+        "zod@^4.6.5"
+      ],
+      "envVars": {
+        "OPENROUTER_API_KEY": "",
+        "OPENROUTER_MODEL": "openrouter/free"
+      },
+      "files": [
+        {
+          "path": "components/glossen/message.ts",
+          "type": "registry:component",
+          "target": "components/glossen/message.ts"
+        },
+        {
+          "path": "lib/glossen/chat.ts",
+          "type": "registry:lib",
+          "target": "lib/glossen/chat.ts"
+        },
+        {
+          "path": "registry/starters/tanstack-start/chat.ts",
+          "type": "registry:file",
+          "target": "routes/api/chat.ts"
+        }
+      ]
+    }
+  ]
+}

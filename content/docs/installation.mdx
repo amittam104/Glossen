@@ -1,0 +1,162 @@
+---
+title: Install on Next.js
+description: Add the Glossen UI and the Next.js backend starter to a Fumadocs app.
+---
+
+This guide installs the UI and the complete backend into a Next.js App Router project that already uses Fumadocs with Fumadocs MDX. If you already have a chat API, follow [Keep your own backend](/docs/existing-backend) instead.
+
+<Steps>
+<Step>
+
+### Add a `components.json`
+
+The shadcn CLI needs a `components.json` file to know where to put files. Fumadocs apps don't have one by default.
+
+Create it by hand rather than running `shadcn init`. `init` rewrites your global CSS with a shadcn theme, which Glossen does not need.
+
+```json title="components.json"
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "app/global.css",
+    "baseColor": "neutral",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/cn",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  }
+}
+```
+
+`aliases.utils` must point to a module that exports a `cn` class-name helper. Apps created with `create-fumadocs-app` already have `lib/cn.ts`. If your project uses `@/lib/utils`, use that instead.
+
+If you already have a `components.json`, keep it.
+
+</Step>
+<Step>
+
+### Install the UI and the backend
+
+```bash
+npx shadcn@latest add https://glossen.vercel.app/r/glossen.json https://glossen.vercel.app/r/glossen-next.json
+```
+
+This adds:
+
+| File                    | Purpose                                                                                   |
+| ----------------------- | ----------------------------------------------------------------------------------------- |
+| `components/glossen/*`  | The chat panel, trigger, selection button, conversation store and Markdown renderer       |
+| `lib/glossen/chat.ts`   | The answer generation: documentation loading, prompt, model call, sources and safe errors |
+| `app/api/chat/route.ts` | A thin App Router route that calls `lib/glossen/chat.ts`                                  |
+
+If `app/api/chat/route.ts` already exists, the CLI asks before replacing it. Answer **no** to keep yours and point Glossen at another endpoint with the `endpoint` option.
+
+</Step>
+<Step>
+
+### Add your OpenRouter key
+
+The CLI adds these variables to `.env.local`. Fill in the key:
+
+```bash title=".env.local"
+OPENROUTER_API_KEY=sk-or-...
+OPENROUTER_MODEL=openrouter/free
+```
+
+The key is only read on the server. See [Model and provider](/docs/model-and-provider) to use another model or provider.
+
+</Step>
+<Step>
+
+### Enable processed Markdown
+
+The backend reads each page with `page.data.getText("processed")`. Turn this on in Fumadocs MDX:
+
+```ts title="lib/source.ts"
+const docs = defineDocs({
+  dir: "content/docs",
+  docs: {
+    postprocess: {
+      includeProcessedMarkdown: true,
+    },
+  },
+})
+
+export const source = loader({
+  baseUrl: "/docs",
+  source: docs.toFumadocsSource(),
+})
+```
+
+New Fumadocs apps already include this. `lib/glossen/chat.ts` imports `source` from `@/lib/source`. If your loader lives somewhere else, change that import.
+
+</Step>
+<Step>
+
+### Mount the provider
+
+Wrap your app in `GlossenProvider` inside Fumadocs' `RootProvider`. It lives in the root layout so conversations keep streaming while readers move between pages.
+
+```tsx title="app/layout.tsx"
+import { RootProvider } from "fumadocs-ui/provider/next"
+import { GlossenProvider } from "@/components/glossen"
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <RootProvider>
+          <GlossenProvider
+            suggestions={["How do I get started?", "What does this library do?"]}
+          >
+            {children}
+          </GlossenProvider>
+        </RootProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+</Step>
+<Step>
+
+### Add the panel to the docs layout
+
+```tsx title="app/docs/layout.tsx"
+import { DocsLayout } from "fumadocs-ui/layouts/docs"
+import { AskAIPanel, AskAITrigger } from "@/components/glossen"
+import { baseOptions } from "@/lib/layout.shared"
+import { source } from "@/lib/source"
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <DocsLayout tree={source.getPageTree()} {...baseOptions()}>
+      {children}
+      <AskAIPanel />
+      <AskAITrigger />
+    </DocsLayout>
+  )
+}
+```
+
+Run `npm run dev`, open a docs page and click **Ask AI**, or press <kbd>⌘</kbd> <kbd>/</kbd> (<kbd>Ctrl</kbd> <kbd>/</kbd> on Windows and Linux).
+
+</Step>
+</Steps>
+
+## Route duration
+
+The starter sets `export const maxDuration = 60` so long answers have time to finish. Your host's plan limits still apply; raising the value gives answers more time but doesn't guarantee they finish.
+
+## Make custom components readable
+
+Glossen sends the **processed Markdown** of every page. Fumadocs converts MDX to Markdown, but custom components with no text content produce nothing the model can read. Keep important information in text, or make your components render meaningful children. You can check what the model sees at `/llms-full.txt` in new Fumadocs apps.

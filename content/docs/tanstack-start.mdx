@@ -1,0 +1,117 @@
+---
+title: Install on TanStack Start
+description: Add Glossen to a Fumadocs site built with TanStack Start.
+---
+
+The UI is the same as on Next.js. Only the backend route and the provider placement differ.
+
+<Steps>
+<Step>
+
+### Add a `components.json`
+
+Create it by hand, pointing at your `src` directory through the `@/*` path alias:
+
+```json title="components.json"
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/app.css",
+    "baseColor": "neutral",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/cn",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  }
+}
+```
+
+</Step>
+<Step>
+
+### Install
+
+```bash
+npx shadcn@latest add https://glossen.vercel.app/r/glossen.json https://glossen.vercel.app/r/glossen-tanstack-start.json
+```
+
+This adds `src/components/glossen/*`, `src/lib/glossen/chat.ts` and the server route `src/routes/api/chat.ts`:
+
+```ts title="src/routes/api/chat.ts"
+import { createFileRoute } from "@tanstack/react-router"
+import { handleChatRequest } from "@/lib/glossen/chat"
+
+export const Route = createFileRoute("/api/chat")({
+  server: {
+    handlers: {
+      POST: ({ request }) => handleChatRequest(request),
+    },
+  },
+})
+```
+
+Fill in `OPENROUTER_API_KEY` in `.env.local` (or `.env`).
+
+</Step>
+<Step>
+
+### Check `src/lib/source.ts`
+
+`lib/glossen/chat.ts` imports `source` from `@/lib/source` and calls `page.data.getText("processed")`. Keep `includeProcessedMarkdown: true` in `defineDocs`. Both sync and `async: true` document loading work.
+
+</Step>
+<Step>
+
+### Mount the provider and panel
+
+Wrap the app in `src/routes/__root.tsx`, inside `RootProvider` from `fumadocs-ui/provider/tanstack`:
+
+```tsx title="src/routes/__root.tsx"
+import { RootProvider } from "fumadocs-ui/provider/tanstack"
+import { GlossenProvider } from "@/components/glossen"
+
+function RootComponent() {
+  return (
+    <html suppressHydrationWarning>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <RootProvider>
+          <GlossenProvider>
+            <Outlet />
+          </GlossenProvider>
+        </RootProvider>
+        <Scripts />
+      </body>
+    </html>
+  )
+}
+```
+
+Then render the panel and trigger next to your docs content, for example inside `DocsLayout` in `src/routes/docs/$.tsx`:
+
+```tsx
+<DocsLayout {...baseOptions()} tree={pageTree}>
+  <Suspense>
+    <Content path={path} markdownUrl={markdownUrl} />
+  </Suspense>
+  <AskAIPanel />
+  <AskAITrigger />
+</DocsLayout>
+```
+
+</Step>
+</Steps>
+
+## Deployment duration
+
+TanStack Start has no `maxDuration` export. Set the function duration in your host's configuration instead. On Vercel with Nitro, set `maxDuration` for the server function in `vercel.json` or the project settings.

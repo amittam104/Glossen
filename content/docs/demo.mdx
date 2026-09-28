@@ -1,0 +1,32 @@
+---
+title: Public demo and privacy
+description: How the Ask AI demo on this site works and what happens to your questions.
+---
+
+<Callout type="warn" title="The demo uses free models">
+  The Ask AI panel on this site runs on **OpenRouter free models**
+  (`openrouter/free`) through Glossen's own server-side key. You don't need to
+  sign in or bring a key.
+</Callout>
+
+## What happens to your questions
+
+When you ask a question in the demo, your question, any passages you attached, the page you asked from and the full Glossen documentation are sent to [OpenRouter](https://openrouter.ai), which forwards them to whichever free-model provider serves the request.
+
+Provider data practices vary. Some providers that serve free models may retain prompts or use them for training. Because `openrouter/free` picks a model per request, the provider can change between questions. See [OpenRouter's privacy and logging documentation](https://openrouter.ai/docs/features/privacy-and-logging) and its [privacy policy](https://openrouter.ai/privacy).
+
+**Don't submit secrets, credentials or personal information in the demo.**
+
+Your conversations are saved only in your own browser. Glossen doesn't store them on a server.
+
+## Demo limits
+
+To keep the demo available, it has limits that installed copies don't have:
+
+- requests larger than **512 KB** are rejected with a message; nothing is truncated;
+- each answer is capped at **4,096 output tokens** and is labelled when it stops at that limit;
+- free models have shared daily request limits, so the demo can be slow or temporarily unavailable.
+
+## Your own installation
+
+When you install Glossen, the chat route runs in **your** app with **your** provider key and **your** chosen model. None of the demo's limits apply, and requests never pass through Glossen's servers.

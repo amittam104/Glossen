@@ -1,0 +1,36 @@
+---
+title: Selection context
+description: Attach selected documentation passages to a question.
+---
+
+Readers can select text in the documentation and click **Ask AI** (or press <kbd>Alt</kbd> <kbd>A</kbd>). Glossen then:
+
+1. opens the chat panel;
+2. attaches the passage to the current conversation's draft;
+3. focuses the question input.
+
+Nothing is sent until the reader submits a question.
+
+## What a passage contains
+
+Each passage keeps:
+
+- the page title and URL where it was selected;
+- the selected text;
+- the nearest heading above the selection, with its anchor in the URL when the heading has one.
+
+These stay attached even if the reader navigates to another page before sending.
+
+## Multiple passages
+
+New selections are **added** to the existing ones, even from different pages. Each passage shows as a removable preview above the input. Glossen sets no limit on the number or length of passages; the model's context window and request size still apply, and Glossen shows an error when they're exceeded.
+
+After sending, the passages clear from the input and stay visible on the sent message. They remain part of the conversation for follow-up questions.
+
+## Where selection works
+
+The Ask AI button only appears for text inside the documentation content (`#nd-page` by default, see `contentSelector`). It doesn't appear for text in chat answers, navigation, the table of contents, buttons or inputs. Add `data-glossen-ignore` to any element to exclude it.
+
+On touch devices the button appears below the selection so it doesn't cover the system selection menu.
+
+Turn selection off with `selection={false}`.

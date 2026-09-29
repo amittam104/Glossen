@@ -33,11 +33,15 @@ export type ResolvedOptions = Required<Omit<GlossenOptions, "welcome">> & {
   welcome: { title: string; description: string }
 }
 
+export type GlossenView = "chat" | "history"
+
 interface GlossenContextValue {
   store: GlossenStore
   options: ResolvedOptions
   open: boolean
   setOpen: (open: boolean) => void
+  view: GlossenView
+  setView: (view: GlossenView) => void
   page: PageContext | null
 }
 
@@ -72,6 +76,7 @@ export function GlossenProvider({
       })
   )
   const [open, setOpen] = useState(false)
+  const [view, setView] = useState<GlossenView>("chat")
   const [page, setPage] = useState<PageContext | null>(null)
   const pathname = usePathname()
 
@@ -93,6 +98,8 @@ export function GlossenProvider({
       store,
       open,
       setOpen,
+      view,
+      setView,
       page,
       options: {
         endpoint,
@@ -113,6 +120,7 @@ export function GlossenProvider({
     [
       store,
       open,
+      view,
       page,
       endpoint,
       historyLimit,

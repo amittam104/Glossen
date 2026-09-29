@@ -3,7 +3,9 @@ import {
   useEffectEvent,
   useRef,
   useState,
+  useSyncExternalStore,
   type ComponentProps,
+  type KeyboardEvent as ReactKeyboardEvent,
 } from "react"
 import { flushSync } from "react-dom"
 import AiArtIcon from "@hugeicons/core-free-icons/AiArtIcon"
@@ -19,8 +21,6 @@ import { useGlossen, useGlossenState } from "./provider"
 import { SelectionAskAI } from "./selection"
 import type { ConversationState } from "./store"
 import { fadeUp, GlossenStyles, IconButton, pluralize } from "./ui"
-
-type View = "chat" | "history"
 
 const stateLabels: Partial<Record<ConversationState, string>> = {
   generating: "Answering",
@@ -177,14 +177,8 @@ function HistoryView({ onSelect }: { onSelect: () => void }) {
   )
 }
 
-function Header({
-  view,
-  setView,
-}: {
-  view: View
-  setView: (view: View) => void
-}) {
-  const { store, setOpen } = useGlossen()
+function Header() {
+  const { store, setOpen, view, setView } = useGlossen()
 
   return (
     <div className="flex h-12 shrink-0 items-center justify-between gap-2 border-b ps-4 pe-2">
@@ -260,11 +254,47 @@ function useHotKeys() {
   }, [])
 }
 
+const modalQuery = "(width < 64rem)"
+
+function subscribeModal(onChange: () => void) {
+  const query = window.matchMedia(modalQuery)
+  query.addEventListener("change", onChange)
+  return () => query.removeEventListener("change", onChange)
+}
+
+function useModal() {
+  return useSyncExternalStore(
+    subscribeModal,
+    () => window.matchMedia(modalQuery).matches,
+    () => false
+  )
+}
+
+const focusable =
+  "a[href], button:not(:disabled), input:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex='-1'])"
+
+function trapFocus(event: ReactKeyboardEvent<HTMLElement>) {
+  if (event.key !== "Tab") return
+  const items = [
+    ...event.currentTarget.querySelectorAll<HTMLElement>(focusable),
+  ].filter((item) => !item.closest("[inert]"))
+  const first = items[0]
+  const last = items.at(-1)
+  if (!first || !last) return
+  if (event.shiftKey && document.activeElement === first) {
+    last.focus()
+    event.preventDefault()
+  } else if (!event.shiftKey && document.activeElement === last) {
+    first.focus()
+    event.preventDefault()
+  }
+}
+
 export function AskAIPanel({ className }: { className?: string }) {
-  const { open, setOpen, options } = useGlossen()
+  const { open, setOpen, options, view, setView } = useGlossen()
   const state = useGlossenState()
   const [rendered, setRendered] = useState(open)
-  const [view, setView] = useState<View>("chat")
+  const modal = useModal()
   const panelRef = useRef<HTMLDivElement>(null)
   useHotKeys()
 
@@ -276,11 +306,11 @@ export function AskAIPanel({ className }: { className?: string }) {
     requestAnimationFrame(() => {
       const panel = panelRef.current
       if (panel && !panel.contains(document.activeElement))
-        panel
-          .querySelector<HTMLElement>(
+        (
+          panel.querySelector<HTMLElement>(
             "[data-glossen-edit-input], [data-glossen-input]"
-          )
-          ?.focus()
+          ) ?? panel.querySelector<HTMLElement>(focusable)
+        )?.focus()
     })
     return () => {
       const trigger = document.querySelector<HTMLElement>(
@@ -316,6 +346,7 @@ export function AskAIPanel({ className }: { className?: string }) {
           ref={panelRef}
           role="dialog"
           aria-label="Ask AI"
+          aria-modal={modal || undefined}
           data-glossen-chat=""
           className={cn(
             "fixed z-40 flex flex-col overflow-hidden bg-fd-background text-fd-foreground [--glossen-width:400px] 2xl:[--glossen-width:440px]",
@@ -329,8 +360,9 @@ export function AskAIPanel({ className }: { className?: string }) {
           onAnimationEnd={(event) => {
             if (event.target === event.currentTarget) close()
           }}
+          onKeyDown={modal ? trapFocus : undefined}
         >
-          <Header view={view} setView={setView} />
+          <Header />
           {view === "history" ? (
             <HistoryView onSelect={() => setView("chat")} />
           ) : (
@@ -372,6 +404,7 @@ export function AskAITrigger({
       data-glossen-trigger=""
       aria-expanded={open}
       aria-keyshortcuts="Meta+/ Control+/"
+      inert={open}
       className={cn(
         "fixed end-4 bottom-4 z-30 flex h-10 items-center gap-2 rounded-full border bg-fd-popover px-4 text-sm font-medium text-fd-foreground shadow-lg transition-[background-color,translate,opacity,scale] duration-200 hover:bg-fd-accent focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none motion-safe:active:scale-[0.97]",
         open && "pointer-events-none translate-y-10 opacity-0",

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useEffectEvent, useRef, useState } from "react"
-import { createPortal } from "react-dom"
+import { createPortal, flushSync } from "react-dom"
 import AiArtIcon from "@hugeicons/core-free-icons/AiArtIcon"
 import { HugeiconsIcon } from "@hugeicons/react"
 import type { Passage } from "./message"
@@ -88,7 +88,7 @@ function isShortcut(event: KeyboardEvent) {
 }
 
 export function SelectionAskAI() {
-  const { store, setOpen, options } = useGlossen()
+  const { store, setOpen, setView, options } = useGlossen()
   const [target, setTarget] = useState<Target | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
@@ -101,7 +101,10 @@ export function SelectionAskAI() {
     store.addPassage(current.passage)
     window.getSelection()?.removeAllRanges()
     setTarget(null)
-    setOpen(true)
+    flushSync(() => {
+      setView("chat")
+      setOpen(true)
+    })
     requestAnimationFrame(() =>
       document
         .querySelector<HTMLElement>(

@@ -233,13 +233,10 @@ export class GlossenStore {
         ? storedActive
         : this.snapshot.activeId
 
-    const drafts: Record<string, Draft> = {}
-    for (const id of [activeId, ...Object.keys(map)]) {
-      const draft = this.storage.readDraft(id)
-      if (draft) drafts[id] = draft
-    }
-
     this.storage.cleanup(activeId, new Set(Object.keys(map)))
+    const drafts: Record<string, Draft> = {}
+    for (const draft of this.storage.listDrafts()) drafts[draft.id] = draft
+
     this.set({ records: map, drafts, activeId, unreadable: unreadable.length })
     void this.reconcile()
   }
@@ -505,9 +502,7 @@ export class GlossenStore {
     const draft = this.snapshot.drafts[id]
     if (!draft) return
     try {
-      if (!draft.text && draft.passages.length === 0 && draft.includePage)
-        this.storage.removeDraft(id)
-      else this.storage.writeDraft(draft)
+      this.storage.writeDraft(draft)
       if (id === this.snapshot.activeId) this.storage.writeActive(id)
     } catch {
       this.failStorage()
@@ -542,6 +537,18 @@ export class GlossenStore {
   }
 
   newChat() {
+    const { drafts, records } = this.snapshot
+    const unsent = Object.values(drafts)
+      .filter(
+        (draft) =>
+          !records[draft.id] && (draft.text.trim() || draft.passages.length > 0)
+      )
+      .sort((a, b) => b.updatedAt - a.updatedAt)[0]
+    if (unsent) {
+      this.select(unsent.id)
+      return
+    }
+
     const current = this.snapshot.activeId
     if (!this.snapshot.records[current] && !isBusy(this.chats.get(current))) {
       this.set({ editing: null })

@@ -209,8 +209,17 @@ export class ConversationStorage {
     this.write(this.key("draft", draft.id), JSON.stringify(draft))
   }
 
-  removeDraft(id: string) {
-    this.remove(this.key("draft", id))
+  listDrafts() {
+    const drafts: Draft[] = []
+    const storage = this.storage
+    if (!storage) return drafts
+    for (let i = 0; i < storage.length; i++) {
+      const parsed = this.parseKey(storage.key(i))
+      if (parsed?.kind !== "draft") continue
+      const draft = this.readDraft(parsed.id)
+      if (draft) drafts.push(draft)
+    }
+    return drafts
   }
 
   readActive() {
@@ -238,7 +247,13 @@ export class ConversationStorage {
       }
       if (parsed.id === activeId || chatIds.has(parsed.id)) continue
       const draft = this.readDraft(parsed.id)
-      if (!draft || now - draft.updatedAt > orphanDraftAge) this.remove(key)
+      if (
+        !draft ||
+        (!draft.text.trim() &&
+          draft.passages.length === 0 &&
+          now - draft.updatedAt > orphanDraftAge)
+      )
+        this.remove(key)
     }
   }
 }

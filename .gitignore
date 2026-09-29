@@ -34,3 +34,6 @@ next-env.d.ts
 
 # local recordings
 /recordings
+
+CONTEXT.md
+IMPLEMENTATION_PLAN.md

@@ -1,12 +1,13 @@
 # Glossen
 
-An editable Ask AI experience for [Fumadocs](https://fumadocs.dev), installed as source through a shadcn registry.
+An editable Ask AI component for [Fumadocs](https://fumadocs.dev), installed as source through a shadcn registry.
 
-- Answers from your entire documentation, with verified source links
-- Current-page context and selected-passage attachments
-- Saved conversations with per-conversation drafts, background answers and multi-tab sync
-- Edit earlier questions and regenerate
-- Next.js and TanStack Start backend starters built on the AI SDK and OpenRouter
+- **A polished chat panel** that uses your Fumadocs theme in light and dark mode
+- **Answers from all of your docs**, with source links checked against your real pages
+- **Context built in**: each question includes the current page, and readers can attach any text they select
+- **Chats that stay put**: saved history, a separate draft for each chat, answers that keep going in the background and sync across tabs
+- **Editable questions**: change an earlier question and get a fresh answer
+- **Ready-made backends** for Next.js and TanStack Start, built on the AI SDK and OpenRouter
 
 Read the documentation at [glossen.vercel.app/docs](https://glossen.vercel.app/docs).
 

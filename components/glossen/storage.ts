@@ -1,5 +1,11 @@
 import { z } from "zod"
-import { passageSchema, type GlossenUIMessage, type Passage } from "./message"
+import {
+  pageSchema,
+  passageSchema,
+  sourceSchema,
+  type GlossenUIMessage,
+  type Passage,
+} from "./message"
 
 export const recordVersion = 1
 
@@ -29,10 +35,28 @@ export interface Draft {
   updatedAt: number
 }
 
+const knownParts = [
+  z.looseObject({ type: z.literal("text"), text: z.string() }),
+  z.looseObject({ type: z.literal("data-page"), data: pageSchema }),
+  z.looseObject({ type: z.literal("data-passage"), data: passageSchema }),
+  z.looseObject({
+    type: z.literal("data-sources"),
+    data: z.array(sourceSchema),
+  }),
+]
+const knownTypes: string[] = knownParts.map((part) => part.shape.type.value)
+
 const messageSchema = z.looseObject({
   id: z.string(),
   role: z.enum(["system", "user", "assistant"]),
-  parts: z.array(z.looseObject({ type: z.string() })),
+  parts: z.array(
+    z.union([
+      ...knownParts,
+      z.looseObject({
+        type: z.string().refine((type) => !knownTypes.includes(type)),
+      }),
+    ])
+  ),
 })
 
 const recordSchema = z.object({

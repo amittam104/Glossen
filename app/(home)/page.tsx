@@ -1,9 +1,17 @@
 import Image from "next/image"
 import Link from "next/link"
-import ArrowRight01Icon from "@hugeicons/core-free-icons/ArrowRight01Icon"
-import Github01Icon from "@hugeicons/core-free-icons/Github01Icon"
+import ArrowUpRight01Icon from "@hugeicons/core-free-icons/ArrowUpRight01Icon"
+import Link01Icon from "@hugeicons/core-free-icons/Link01Icon"
+import MessageMultiple01Icon from "@hugeicons/core-free-icons/MessageMultiple01Icon"
+import PaintBrush01Icon from "@hugeicons/core-free-icons/PaintBrush01Icon"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { CopyCommand } from "@/components/site/copy-command"
+import {
+  AnswerActions,
+  LandingComposer,
+  ScrollHint,
+  SuggestedQuestion,
+} from "@/components/site/landing-chat"
 import { buttonVariants } from "@/components/ui/button"
 import { gitConfig } from "@/lib/shared"
 import { cn } from "@/lib/utils"
@@ -11,128 +19,236 @@ import { cn } from "@/lib/utils"
 const installCommand =
   "pnpm dlx shadcn@latest add https://glossen.vercel.app/r/glossen.json"
 
-const features = [
-  "Answers from your whole documentation",
-  "Selection context",
-  "Saved conversations",
-  "Edit & regenerate",
-  "Next.js and TanStack Start",
+const suggestions = [
+  "How does Glossen work?",
+  "What can my readers do with it?",
+  "How do I add it to my docs?",
 ]
+
+const passageAnswer =
+  "Glossen sends the selected text with your question, along with its heading and page. The answer starts from that text, and the chat can still use your whole documentation if it needs to."
+
+const featureSources = [
+  { title: "Conversations and history", href: "/docs/conversations" },
+  { title: "Editing questions", href: "/docs/editing" },
+]
+
+const setupSources = [
+  { title: "Install on Next.js", href: "/docs/installation" },
+  { title: "Install on TanStack Start", href: "/docs/tanstack-start" },
+]
+
+const sources = [
+  { title: "Selection context", href: "/docs/selection" },
+  { title: "Configuration", href: "/docs/configuration" },
+]
+
+const features = [
+  {
+    icon: Link01Icon,
+    title: "Links to the right pages",
+    description:
+      "Every answer links to the docs pages it used. Each link is checked, so readers never land on a missing page.",
+  },
+  {
+    icon: MessageMultiple01Icon,
+    title: "Saves conversations",
+    description:
+      "Readers can go back to past chats, edit a question, and keep an unsent message while they browse other pages.",
+  },
+  {
+    icon: PaintBrush01Icon,
+    title: "Matches your site",
+    description:
+      "The chat uses your design system and works in both light and dark mode.",
+  },
+]
+
+function UserBubble({ children }: { children: string }) {
+  return (
+    <p className="max-w-[80%] self-end rounded-2xl rounded-br-sm border bg-secondary px-3.5 py-2.5 text-sm">
+      {children}
+    </p>
+  )
+}
+
+function Byline() {
+  return (
+    <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+      <Image
+        src="/logo_minimal.svg"
+        alt=""
+        width={40}
+        height={40}
+        className="size-5 rounded-md"
+      />
+      Glossen
+    </div>
+  )
+}
+
+function SectionHeading({ children }: { children: string }) {
+  return (
+    <h2 className="text-[22px] leading-normal font-medium tracking-tight text-balance">
+      {children}
+    </h2>
+  )
+}
 
 export default function HomePage() {
   return (
-    <main className="relative isolate flex flex-1 flex-col overflow-hidden">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 [background:radial-gradient(60rem_32rem_at_50%_-8rem,color-mix(in_oklch,var(--primary)_16%,transparent),transparent_70%),radial-gradient(40rem_24rem_at_85%_30%,color-mix(in_oklch,oklch(0.8_0.12_60)_14%,transparent),transparent_70%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 [background-image:radial-gradient(color-mix(in_oklch,var(--foreground)_18%,transparent)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)] [background-size:22px_22px] opacity-60 dark:opacity-40"
-      />
-      <div
-        aria-hidden
-        className="[background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22160%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22 stitchTiles=%22stitch%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>')] pointer-events-none absolute inset-0 -z-10 opacity-[0.035] mix-blend-multiply dark:mix-blend-screen"
-      />
+    <main className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col gap-24 px-6 pb-16 sm:px-12">
+        <section className="flex min-h-[calc(100svh-12.5rem)] flex-col justify-between gap-14 pt-14 sm:pt-20">
+          <div className="flex flex-col gap-4">
+            <Image
+              src="/logo.svg"
+              alt=""
+              width={40}
+              height={40}
+              className="size-12 rounded-xl"
+            />
+            <h1 className="mt-2 text-[34px] leading-[1.15] font-semibold tracking-tight text-balance sm:text-[40px]">
+              Improved AI chat for your
+              <br />
+              Fumadocs Documentation
+            </h1>
+            <p className="text-md max-w-[60ch] leading-normal text-pretty text-muted-foreground">
+              Use in your Fumadocs to get AI-powered chat assistance. Select any
+              text in documentation and use Ask AI to get answers.
+            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <Link
+                href="/docs/installation"
+                className={cn(buttonVariants({ size: "lg" }), "h-9 px-3.5")}
+              >
+                Add to your docs
+                <HugeiconsIcon
+                  icon={ArrowUpRight01Icon}
+                  data-icon="inline-end"
+                  aria-hidden
+                />
+              </Link>
+              <a
+                href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
+                target="_blank"
+                rel="noreferrer"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "h-9 px-3.5"
+                )}
+              >
+                <Image
+                  src="/GitHub_Invertocat_Black.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                  className="size-4 dark:invert"
+                />
+                GitHub
+              </a>
+            </div>
+            <div className="pt-3">
+              {suggestions.map((question) => (
+                <SuggestedQuestion key={question}>{question}</SuggestedQuestion>
+              ))}
+            </div>
+          </div>
+          <ScrollHint target="how-it-works" />
+        </section>
 
-      <section className="mx-auto flex w-full max-w-5xl flex-col items-center px-6 pt-20 pb-16 text-center md:pt-28">
-        <Link
-          href="/docs/demo"
-          className="mb-7 inline-flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur transition-colors hover:text-foreground"
+        <section
+          id="how-it-works"
+          aria-label="Asking about a passage"
+          className="flex scroll-mt-20 flex-col gap-5"
         >
-          <span className="size-1.5 rounded-full bg-primary" />
-          Free and open source · MIT
-        </Link>
+          <UserBubble>Can I ask about one specific part of a page?</UserBubble>
+          <div className="flex flex-col gap-3.5">
+            <Byline />
+            <SectionHeading>Yes. Highlight it and ask.</SectionHeading>
+            <figure className="flex flex-col gap-1.5">
+              <div
+                data-glossen-content=""
+                className="rounded-xl border border-border/70 bg-card/60 px-4 py-3.5 text-sm leading-relaxed text-muted-foreground selection:bg-mark selection:text-mark-foreground"
+              >
+                Sometimes only one sentence on a page is confusing. Select that
+                sentence and click Ask AI. Glossen adds it to your question, so
+                you don’t have to copy and paste anything.
+              </div>
+              <figcaption className="px-4 text-end text-[10px] text-muted-foreground/60">
+                Try it: select any text in this box, then click Ask AI.
+              </figcaption>
+            </figure>
+            <p className="text-[15px] leading-normal text-pretty">
+              {passageAnswer}
+            </p>
+            <AnswerActions text={passageAnswer} sources={sources} />
+          </div>
+        </section>
 
-        <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance md:text-6xl md:leading-[1.05]">
-          Ask AI for your{" "}
-          <span className="bg-gradient-to-br from-primary to-[oklch(0.62_0.16_330)] bg-clip-text text-transparent">
-            Fumadocs
-          </span>{" "}
-          site
-        </h1>
-        <p className="mt-5 max-w-2xl text-base text-pretty text-muted-foreground md:text-lg">
-          Glossen gives readers answers built from your entire documentation,
-          with sources, selected passages, saved chats and editable questions.
-          Install it as source you own through a shadcn registry.
-        </p>
-
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/docs/installation"
-            className={cn(buttonVariants({ size: "lg" }), "h-10 px-4")}
-          >
-            Get started
-            <HugeiconsIcon
-              icon={ArrowRight01Icon}
-              data-icon="inline-end"
-              aria-hidden
-            />
-          </Link>
-          <a
-            href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
-            className={cn(
-              buttonVariants({ variant: "outline", size: "lg" }),
-              "h-10 bg-background/70 px-4 backdrop-blur"
-            )}
-          >
-            <HugeiconsIcon
-              icon={Github01Icon}
-              data-icon="inline-start"
-              aria-hidden
-            />
-            GitHub
-          </a>
-        </div>
-
-        <div className="mt-8 flex w-full justify-center">
-          <CopyCommand command={installCommand} />
-        </div>
-
-        <ul className="mt-8 flex max-w-3xl flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-          {features.map((feature) => (
-            <li key={feature} className="flex items-center gap-2">
-              <span className="size-1 rounded-full bg-primary/70" />
-              {feature}
-            </li>
-          ))}
-        </ul>
-
-        <figure className="relative mt-14 w-full">
-          <div
-            aria-hidden
-            className="absolute inset-x-12 -top-6 bottom-6 -z-10 rounded-[2rem] bg-primary/20 blur-3xl"
-          />
-          <div className="overflow-hidden rounded-2xl border bg-card shadow-2xl ring-1 ring-black/5">
-            <Image
-              src="/screenshots/chat-light.png"
-              alt="The Glossen Ask AI panel answering a question next to a documentation page"
-              width={1280}
-              height={800}
-              priority
-              className="block h-auto w-full dark:hidden"
-            />
-            <Image
-              src="/screenshots/chat-dark.png"
-              alt="The Glossen Ask AI panel answering a question next to a documentation page"
-              width={1280}
-              height={800}
-              className="hidden h-auto w-full dark:block"
+        <section className="flex flex-col gap-5">
+          <UserBubble>What else can it do?</UserBubble>
+          <div className="flex flex-col gap-2">
+            <Byline />
+            <SectionHeading>Here is what else it does.</SectionHeading>
+            <ul>
+              {features.map((feature) => (
+                <li key={feature.title} className="flex gap-3.5 py-3.5">
+                  <HugeiconsIcon
+                    icon={feature.icon}
+                    aria-hidden
+                    className="mt-0.5 size-[18px] shrink-0 text-muted-foreground"
+                  />
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-[15px] font-medium">{feature.title}</h3>
+                    <p className="text-sm leading-normal text-muted-foreground">
+                      {feature.description}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <AnswerActions
+              text={features
+                .map((feature) => `${feature.title} ${feature.description}`)
+                .join("\n")}
+              sources={featureSources}
             />
           </div>
-          <figcaption className="mt-4 text-sm text-muted-foreground">
-            Try it live: open the{" "}
-            <Link
-              href="/docs"
-              className="font-medium text-foreground underline"
-            >
-              docs
-            </Link>{" "}
-            and click{" "}
-            <span className="font-medium text-foreground">Ask AI</span>.
-          </figcaption>
-        </figure>
-      </section>
+        </section>
+
+        <section className="flex flex-col gap-5">
+          <UserBubble>How do I add it to my docs?</UserBubble>
+          <div className="flex flex-col gap-3.5">
+            <Byline />
+            <SectionHeading>One command. Then it’s your code.</SectionHeading>
+            <p className="text-sm leading-normal text-pretty text-muted-foreground">
+              Install the UI and a chat route from the shadcn registry. Add the
+              provider, bring your API key, and make it yours.
+            </p>
+            <CopyCommand command={installCommand} />
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Link
+                href="/docs/installation"
+                className="inline-flex items-center gap-1 rounded-sm text-[13px] font-medium text-link underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              >
+                Read the setup guide
+                <HugeiconsIcon
+                  icon={ArrowUpRight01Icon}
+                  aria-hidden
+                  className="size-3.5"
+                />
+              </Link>
+              <span className="text-xs text-muted-foreground">
+                Open source · MIT licensed
+              </span>
+            </div>
+            <AnswerActions text={installCommand} sources={setupSources} />
+          </div>
+        </section>
+      </div>
+
+      <LandingComposer placeholder="Ask a question about Glossen…" />
     </main>
   )
 }

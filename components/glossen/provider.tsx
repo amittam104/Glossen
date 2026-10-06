@@ -50,7 +50,12 @@ const noSuggestions: string[] = []
 const GlossenContext = createContext<GlossenContextValue | null>(null)
 
 function readPage(pathname: string, contentSelector: string): PageContext {
-  const heading = document.querySelector(`${contentSelector} h1`)
+  const heading = document.querySelector(
+    contentSelector
+      .split(",")
+      .map((selector) => `${selector.trim()} h1`)
+      .join(",")
+  )
   const title =
     heading?.textContent?.trim() || document.title.trim() || pathname
   return { title, url: pathname }

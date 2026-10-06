@@ -15,11 +15,11 @@ export const metadata: Metadata = {
       : "http://localhost:3002"
   ),
   title: {
-    default: "Glossen — Ask AI for Fumadocs",
+    default: "Glossen: AI chat for Fumadocs",
     template: "%s | Glossen",
   },
   description:
-    "An editable Ask AI experience for Fumadocs, installed as source through a shadcn registry.",
+    "An AI chat for Fumadocs sites. Readers ask questions and get answers that link to the right pages.",
 }
 
 export default function Layout({ children }: LayoutProps<"/">) {
@@ -32,6 +32,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-screen flex-col">
         <RootProvider>
           <GlossenProvider
+            contentSelector="#nd-page, [data-glossen-content]"
             welcome={{
               title: "Ask anything about Glossen",
               description:

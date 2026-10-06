@@ -12,6 +12,7 @@ import Refresh01Icon from "@hugeicons/core-free-icons/Refresh01Icon"
 import Tick02Icon from "@hugeicons/core-free-icons/Tick02Icon"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { useGlossen } from "@/components/glossen"
+import { createId } from "@/components/glossen/store"
 import { IconButton } from "@/components/glossen/ui"
 import { cn } from "@/lib/utils"
 
@@ -21,7 +22,7 @@ function useAsk() {
   return async (text: string) => {
     const question = text.trim()
     if (!question) return false
-    const id = crypto.randomUUID()
+    const id = createId()
     store.select(id)
     store.updateDraft(id, { text: question, passages: [] })
     setOpen(true)

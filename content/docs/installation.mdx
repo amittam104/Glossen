@@ -160,3 +160,19 @@ The starter sets `export const maxDuration = 60` so long answers have time to fi
 ## Make custom components readable
 
 Glossen sends the **processed Markdown** of every page. Fumadocs converts MDX to Markdown, but custom components with no text content produce nothing the model can read. Keep important information in text, or make your components render meaningful children. You can check what the model sees at `/llms-full.txt` in new Fumadocs apps.
+
+## Troubleshooting
+
+### `ERR_PNPM_IGNORED_BUILDS` during install
+
+pnpm 11 and later won't add packages while a dependency's build script is waiting for approval. New Fumadocs apps ship `esbuild` and `unrs-resolver` in that state, so `shadcn add` stops before writing any files.
+
+Approve the packages listed in the error in `pnpm-workspace.yaml`, then run the install command again:
+
+```yaml title="pnpm-workspace.yaml"
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
+```
+
+`pnpm approve-builds` does the same interactively.

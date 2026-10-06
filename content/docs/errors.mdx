@@ -21,6 +21,10 @@ A failed question stays in the conversation with its passages, so nothing needs 
 
 ## Troubleshooting
 
+### `shadcn add` fails with `ERR_PNPM_IGNORED_BUILDS`
+
+pnpm is waiting for you to approve a dependency's build script. See [Troubleshooting](/docs/installation#troubleshooting) in the install guide.
+
 ### "The chat service isn't configured yet."
 
 `OPENROUTER_API_KEY` is missing on the server. Add it to `.env.local` and restart the dev server.

@@ -115,3 +115,18 @@ Then render the panel and trigger next to your docs content, for example inside 
 ## Deployment duration
 
 TanStack Start has no `maxDuration` export. Set the function duration in your host's configuration instead. On Vercel with Nitro, set `maxDuration` for the server function in `vercel.json` or the project settings.
+
+## Troubleshooting
+
+### `ERR_PNPM_IGNORED_BUILDS` during install
+
+pnpm 11 and later won't add packages while a dependency's build script is waiting for approval. New Fumadocs apps ship `esbuild` in that state, so `shadcn add` stops before writing any files.
+
+Approve the packages listed in the error in `pnpm-workspace.yaml`, then run the install command again:
+
+```yaml title="pnpm-workspace.yaml"
+allowBuilds:
+  esbuild: true
+```
+
+`pnpm approve-builds` does the same interactively.

@@ -6,6 +6,7 @@ import AiArtIcon from "@hugeicons/core-free-icons/AiArtIcon"
 import { HugeiconsIcon } from "@hugeicons/react"
 import type { Passage } from "./message"
 import { useGlossen } from "./provider"
+import { usesMacKeys } from "./ui"
 
 const excluded =
   "[data-glossen-chat], [data-glossen-ignore], nav, header, footer, button, input, textarea, select, [contenteditable]:not([contenteditable='false']), #nd-toc, #nd-sidebar"
@@ -159,7 +160,7 @@ export function SelectionAskAI() {
       type="button"
       data-glossen-ignore=""
       aria-keyshortcuts="Alt+A"
-      title="Ask AI about this selection (Alt+A)"
+      title={`Ask AI about this selection (${usesMacKeys() ? "⌥A" : "Alt+A"})`}
       style={{ top, left, width }}
       className="fixed z-50 flex h-9 items-center justify-center gap-1.5 rounded-full border bg-fd-popover text-[13px] font-medium text-fd-foreground shadow-lg transition-colors hover:bg-fd-accent focus-visible:ring-2 focus-visible:ring-fd-ring focus-visible:outline-none motion-safe:animate-[glossen-fade-up_200ms_ease-out_both]"
       onPointerDown={(event) => event.preventDefault()}

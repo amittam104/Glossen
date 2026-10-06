@@ -11,6 +11,7 @@ import {
   Pnpm,
   PnpmDark,
 } from "@/components/site/package-manager-icons"
+import { Shortcut } from "@/components/site/shortcut"
 
 function CodeBlockTabsTrigger({
   children,
@@ -41,6 +42,7 @@ export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
     CodeBlockTabsTrigger,
+    Shortcut,
     Step,
     Steps,
     Tab,

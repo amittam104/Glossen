@@ -10,6 +10,15 @@ import Link from "fumadocs-core/link"
 import { cn } from "@/lib/cn"
 import type { PageContext, Passage } from "./message"
 
+export function usesMacKeys() {
+  const platform =
+    (navigator as Navigator & { userAgentData?: { platform: string } })
+      .userAgentData?.platform ?? navigator.platform
+  return (
+    !/win|linux|cros/i.test(platform) || /android/i.test(navigator.userAgent)
+  )
+}
+
 export const fadeUp =
   "motion-safe:animate-[glossen-fade-up_400ms_cubic-bezier(0.23,1,0.32,1)_both]"
 

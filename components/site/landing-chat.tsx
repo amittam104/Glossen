@@ -18,14 +18,14 @@ import { cn } from "@/lib/utils"
 function useAsk() {
   const { store, page, setOpen } = useGlossen()
 
-  return (text: string) => {
+  return async (text: string) => {
     const question = text.trim()
-    if (!question) return
-    store.newChat()
-    const id = store.getSnapshot().activeId
+    if (!question) return false
+    const id = crypto.randomUUID()
+    store.select(id)
     store.updateDraft(id, { text: question, passages: [] })
     setOpen(true)
-    void store.send(id, page)
+    return store.send(id, page)
   }
 }
 
@@ -35,7 +35,7 @@ export function SuggestedQuestion({ children }: { children: string }) {
   return (
     <button
       type="button"
-      onClick={() => ask(children)}
+      onClick={() => void ask(children)}
       className="group flex w-full cursor-pointer items-center gap-2.5 border-b py-2.5 text-start text-sm text-muted-foreground transition-colors last:border-b-0 hover:text-foreground focus-visible:text-foreground focus-visible:outline-none"
     >
       <HugeiconsIcon
@@ -74,10 +74,11 @@ export function LandingComposer({ placeholder }: { placeholder: string }) {
   const [text, setText] = useState("")
   const ready = text.trim().length > 0
 
-  function submit() {
+  async function submit() {
     if (!ready) return
-    ask(text)
+    const question = text
     setText("")
+    if (!(await ask(question))) setText(question)
   }
 
   return (
@@ -85,7 +86,7 @@ export function LandingComposer({ placeholder }: { placeholder: string }) {
       <form
         onSubmit={(event) => {
           event.preventDefault()
-          submit()
+          void submit()
         }}
         className="flex flex-col gap-1 rounded-2xl border bg-card p-1.5 transition-colors focus-within:border-ring"
       >
@@ -99,9 +100,10 @@ export function LandingComposer({ placeholder }: { placeholder: string }) {
           placeholder={placeholder}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={(event) => {
+            if (event.nativeEvent.isComposing || event.keyCode === 229) return
             if (event.key === "Enter" && !event.shiftKey) {
               event.preventDefault()
-              submit()
+              void submit()
             }
           }}
           className="field-sizing-content max-h-40 min-h-9 resize-none bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground"
